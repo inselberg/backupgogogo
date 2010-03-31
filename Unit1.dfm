@@ -15,36 +15,6 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object JvPanel1: TJvPanel
-    Left = 0
-    Top = 0
-    Width = 473
-    Height = 218
-    HotTrackFont.Charset = DEFAULT_CHARSET
-    HotTrackFont.Color = clWindowText
-    HotTrackFont.Height = -11
-    HotTrackFont.Name = 'Tahoma'
-    HotTrackFont.Style = []
-    Align = alClient
-    Caption = 'JvPanel1'
-    TabOrder = 0
-    ExplicitWidth = 225
-    ExplicitHeight = 224
-    object JvxCheckListBox1: TJvxCheckListBox
-      Left = 1
-      Top = 1
-      Width = 471
-      Height = 216
-      Align = alClient
-      ItemHeight = 13
-      TabOrder = 0
-      OnClickCheck = JvxCheckListBox1ClickCheck
-      OnKeyDown = JvxCheckListBox1KeyDown
-      ExplicitLeft = 0
-      ExplicitTop = -4
-      InternalVersion = 202
-    end
-  end
   object JvPanel3: TJvPanel
     Left = 0
     Top = 218
@@ -56,10 +26,7 @@ object Form1: TForm1
     HotTrackFont.Name = 'Tahoma'
     HotTrackFont.Style = []
     Align = alBottom
-    TabOrder = 1
-    ExplicitLeft = -8
-    ExplicitTop = 227
-    ExplicitWidth = 596
+    TabOrder = 0
     object JvLabel1: TJvLabel
       Left = 8
       Top = 11
@@ -100,19 +67,29 @@ object Form1: TForm1
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 281
-    ExplicitWidth = 635
   end
   object JvMemo1: TJvMemo
-    Left = 225
+    Left = 0
     Top = 0
-    Width = 410
-    Height = 224
-    Lines.Strings = (
-      'JvMemo1')
-    TabOrder = 3
+    Width = 473
+    Height = 218
+    Align = alClient
+    TabOrder = 2
     Visible = False
     WordWrap = False
+    OnClick = JvMemo1Click
+  end
+  object JvxCheckListBox1: TJvxCheckListBox
+    Left = 0
+    Top = 0
+    Width = 473
+    Height = 218
+    Align = alClient
+    ItemHeight = 13
+    TabOrder = 3
+    OnClickCheck = JvxCheckListBox1ClickCheck
+    OnKeyDown = JvxCheckListBox1KeyDown
+    InternalVersion = 202
   end
   object JvSelectDirectory1: TJvSelectDirectory
     Left = 504
@@ -136,5 +113,28 @@ object Form1: TForm1
       Caption = 'Verzeichnis hinzuf'#252'gen'
       OnClick = miVerzeichnisAddClick
     end
+    object miHilfe: TMenuItem
+      Caption = 'Hilfe'
+      object miAbout: TMenuItem
+        Caption = #252'ber...'
+        OnClick = miAboutClick
+      end
+      object miC4U: TMenuItem
+        Caption = 'auf updates '#252'berpr'#252'fen'
+        OnClick = miC4UClick
+      end
+    end
+  end
+  object IdHTTP1: TIdHTTP
+    AllowCookies = True
+    ProxyParams.BasicAuthentication = False
+    ProxyParams.ProxyPort = 0
+    Request.ContentLength = -1
+    Request.Accept = 'text/html, */*'
+    Request.BasicAuthentication = False
+    Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
+    HTTPOptions = [hoForceEncodeParams]
+    Left = 352
+    Top = 88
   end
 end

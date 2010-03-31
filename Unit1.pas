@@ -2,17 +2,20 @@ unit Unit1;
 
 interface
 
+
+
 uses
   shellapi, jcldatetime,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, JvBaseDlg, JvSelectDirectory, ExtCtrls, JvExExtCtrls, JvExtComponent, JvPanel, StdCtrls, JvExStdCtrls,
   JvMemo,
   JvListBox, JvDriveCtrls, JvExControls, JvxCheckListBox, JvSimpleXml, ComCtrls, JvExComCtrls, JvStatusBar, Mask,
-  JvExMask, JvToolEdit, Menus, JvMenus, JvLabel;
+  JvExMask, JvToolEdit, Menus, JvMenus, JvLabel, IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP;
+
+const cRELEASE='2';
 
 type
   TForm1 = class(TForm)
-    JvPanel1: TJvPanel;
     JvSelectDirectory1: TJvSelectDirectory;
     JvxCheckListBox1: TJvxCheckListBox;
     JvPanel3: TJvPanel;
@@ -24,15 +27,24 @@ type
     JvMainMenu1: TJvMainMenu;
     miVerzeichnisAdd: TMenuItem;
     JvLabel1: TJvLabel;
+    miHilfe: TMenuItem;
+    miAbout: TMenuItem;
+    IdHTTP1: TIdHTTP;
+    miC4U: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure bDoBackupClick(Sender: TObject);
     procedure JvxCheckListBox1ClickCheck(Sender: TObject);
     procedure JvDirectoryEdit1Change(Sender: TObject);
     procedure miVerzeichnisAddClick(Sender: TObject);
     procedure JvxCheckListBox1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure miAboutClick(Sender: TObject);
+    procedure JvMemo1Click(Sender: TObject);
+    procedure miC4UClick(Sender: TObject);
   private
     { Private-Deklarationen }
     sLetztesBackup: string;
+    function ShowMemo(bShow: boolean): boolean;
+
     function GetFileName(fn: string): string;
 
   public
@@ -46,6 +58,8 @@ var
 implementation
 
 {$R *.dfm}
+
+
 
 // http://www.delphipraxis.net/topic1451_dateioperationen+mit+shfileoperation.html by sakura
 function DoFileWork(aOperation: FILEOP_FLAGS; aFrom, aTo: pwidechar; Flags: FILEOP_FLAGS): Integer;
@@ -61,16 +75,18 @@ begin
     wFunc := aOperation;
     pFrom := FromPath;
     if ToPath <> '' then
-    begin
       pTo := ToPath
-    end
     else
-    begin // target available
       pTo := nil;
-    end; // target not available
     fFlags := Flags;
   end; // structure
   Result := SHFileOperationW(SHFileOpStruct);
+end;
+
+function TForm1.ShowMemo(bShow: boolean): boolean;
+begin
+  JvMemo1.Visible := bShow;
+  JvxCheckListBox1.Visible := not JvMemo1.Visible;
 end;
 
 function TForm1.GetFileName(fn: string): string;
@@ -81,6 +97,11 @@ end;
 procedure TForm1.JvDirectoryEdit1Change(Sender: TObject);
 begin
   SaveSettings;
+end;
+
+procedure TForm1.JvMemo1Click(Sender: TObject);
+begin
+  ShowMemo(false);
 end;
 
 procedure TForm1.JvxCheckListBox1ClickCheck(Sender: TObject);
@@ -103,6 +124,32 @@ begin
 
     SaveSettings;
   end;
+end;
+
+procedure TForm1.miAboutClick(Sender: TObject);
+begin
+  JvMemo1.text := 'backupgogogo:' + #13#10 + ' --bak: auto. backup' + #13#10 + '--exit: exit program' + #13#10 +
+    #13#10 + 'url: http://github.com/inselberg/backupgogogo/blob/master/backupgogogo.exe';
+  ShowMemo(true);
+end;
+
+procedure TForm1.miC4UClick(Sender: TObject);
+var
+  html: string;
+  suche: string;
+begin
+  JvStatusBar1.simpletext := 'checking....';
+//  ShowMemo(true);
+  suche := '<div class="message"><pre><a href="/inselberg/backupgogogo/commit/';
+  html := IdHTTP1.get('http://github.com/inselberg/backupgogogo/blob/master/backupgogogo.exe');
+  html := copy(html, pos(suche, html) + length(suche), length(html));
+  html := copy(html, pos('>', html) + 1, length(html));
+  html := copy(html, 1, pos('</a>', html) - 1);
+  JvMemo1.text := (html);
+  if html = cRELEASE+'nd release' then
+    JvStatusBar1.simpletext := 'newst version.'
+  else
+    JvStatusBar1.simpletext := 'newer version available.';
 end;
 
 procedure TForm1.miVerzeichnisAddClick(Sender: TObject);
@@ -139,7 +186,6 @@ var
   Year, Month, Day: Word;
   quelle, ziel: string;
   dt: tdatetime;
-
 begin
   JvMemo1.Lines.clear;
   dt := now;
@@ -153,13 +199,13 @@ begin
     if JvxCheckListBox1.Checked[i] then
     begin
       quelle := JvxCheckListBox1.items[i];
-      JvStatusBar1.SimpleText := quelle + '->' + ziel;
+      JvStatusBar1.simpletext := quelle + '->' + ziel;
       r := r + DoFileWork(FO_COPY, pwidechar(quelle + #0#0), pwidechar(ziel + #0 + #0), FOF_RENAMEONCOLLISION);
     end;
 
-  JvStatusBar1.SimpleText := 'Backup beendet.';
+  JvStatusBar1.simpletext := 'Backup beendet.';
   if r > 0 then
-    JvStatusBar1.SimpleText := 'Mögliche Fehler im Bakup';
+    JvStatusBar1.simpletext := 'Mögliche Fehler im Bakup';
 
   SaveSettings;
 end;
@@ -193,10 +239,8 @@ begin
         value := BoolToStr(JvxCheckListBox1.Checked[i]);
     end;
   end;
-
   xml.SaveToFile(GetFileName('settings.xml'));
-  JvMemo1.Text := xml.SaveToString;
-
+  JvMemo1.text := xml.SaveToString;
 end;
 
 function GetXMLChildValue(xml: TJvSimpleXML; itemname: String; var ctrl: longint): string;
@@ -259,16 +303,18 @@ begin
 
   Form1.Caption := Application.Title + ' ' + sLetztesBackup;
 
-  str:='';
-   for i := 1 to paramcount do
-   begin
-    str:=str+paramstr(i);
-    if paramstr(i) = '--bak' then bDoBackupClick(sender);
-    if paramstr(i) = '--exit' then application.Terminate;
-   end;
+  str := '';
+  for i := 1 to paramcount do
+  begin
+    str := str + paramstr(i);
+    if paramstr(i) = '--bak' then
+      bDoBackupClick(Sender);
+    if paramstr(i) = '--exit' then
+      Application.Terminate;
+  end;
 
-  jvstatusbar1.simpletext := str;
-
+  JvStatusBar1.simpletext := str;
+  ShowMemo(false);
 end;
 
 end.
