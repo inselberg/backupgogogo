@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2010.03.30 21:38:12.255.pas,C:\Users\root\Documents\RAD Studio\Projekte\Unit1.pas=D:\!src\bds\backupgogogo\Unit1.pas</Transaction>
+    <Transaction>2010.03.30 21:38:12.255.dfm,C:\Users\root\Documents\RAD Studio\Projekte\Unit1.dfm=D:\!src\bds\backupgogogo\Unit1.dfm</Transaction>
+    <Transaction>2010.03.30 21:38:22.666.dproj,C:\Users\root\Documents\RAD Studio\Projekte\Project1.dproj=D:\!src\bds\backupgogogo\backupgogogo.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
